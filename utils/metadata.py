@@ -25,7 +25,7 @@ def metadata_generator(folder, file_format):
     '''
 
     filelist = []
-    Df = pd.DataFrame(columns=['filename', 'datetime', 'length', 'sr'])
+    data_rows = []  # Collect rows instead of concatenating iteratively
     Df_error = pd.DataFrame(columns=['filename'])
     if file_format == 'wav':
         n = 3
@@ -48,7 +48,19 @@ def metadata_generator(folder, file_format):
             print('skipping short file')
             continue
 
-        Df = pd.concat([Df, pd.DataFrame({'datetime': [meta['datetime']], 'filename': [wavfile], 
-                        'length' : [len(x)], 'sr' : [sr], 'dB' : 10*np.log10(np.std(x)**2)})], ignore_index=True)
-    Df = Df.sort_values('datetime').reset_index()
+        # Collect data in a list instead of concatenating iteratively
+        data_rows.append({
+            'datetime': meta['datetime'],
+            'filename': wavfile,
+            'length': len(x),
+            'sr': sr,
+            'dB': 10*np.log10(np.std(x)**2)
+        })
+    
+    # Create DataFrame from collected rows all at once
+    Df = pd.DataFrame(data_rows)
+    if not Df.empty:
+        Df = Df.sort_values('datetime').reset_index(drop=True)
+    else:
+        Df = pd.DataFrame(columns=['filename', 'datetime', 'length', 'sr', 'dB'])
     return(Df)
