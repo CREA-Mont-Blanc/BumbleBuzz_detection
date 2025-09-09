@@ -8,59 +8,63 @@ import torchaudio
 import pandas as pd
 import numpy as np
 
+
 def get_file_list(path_audio_folder):
     """return list of wav file in a give folder"""
 
     wav_files = []
     for root, dirs, files in os.walk(path_audio_folder, topdown=False):
         for name in files:
-            if name[-3:].casefold() == 'wav' and name[:2] != '._':
-                wav_files.append(os.path.join(root,name))
+            if name[-3:].casefold() == "wav" and name[:2] != "._":
+                wav_files.append(os.path.join(root, name))
 
     return wav_files
 
 
 def metadata_generator(folder, file_format):
-    '''Generate meta data for one folder (one site) and save in csv and pkl
-    '''
+    """Generate meta data for one folder (one site) and save in csv and pkl"""
 
     filelist = []
     data_rows = []  # Collect rows instead of concatenating iteratively
-    Df_error = pd.DataFrame(columns=['filename'])
-    if file_format == 'wav':
+    Df_error = pd.DataFrame(columns=["filename"])
+    if file_format == "wav":
         n = 3
     elif file_format == "flac":
         n = 4
     else:
-        raise(f'Format: {file_format} is not allowed')
+        raise (f"Format: {file_format} is not allowed")
 
     for root, dirs, files in os.walk(folder, topdown=False):
         for name in files:
-            if name[-n:].casefold() == file_format and name[:2] != '._':
+            if name[-n:].casefold() == file_format and name[:2] != "._":
                 filelist.append(os.path.join(root, name))
-        
+
     for idx, wavfile in enumerate(tqdm(filelist)):
-        _, meta = utils.read_audio_hdr(wavfile, False, file_format = file_format) #meta data
+        _, meta = utils.read_audio_hdr(
+            wavfile, False, file_format=file_format
+        )  # meta data
         try:
 
-            x, sr = librosa.load(wavfile, sr = None, mono=True)
+            x, sr = librosa.load(wavfile, sr=None, mono=True)
         except:
-            print('skipping short file')
+            print("skipping short file")
             continue
 
         # Collect data in a list instead of concatenating iteratively
-        data_rows.append({
-            'datetime': meta['datetime'],
-            'filename': wavfile,
-            'length': len(x),
-            'sr': sr,
-            'dB': 10*np.log10(np.std(x)**2)
-        })
-    
+        data_rows.append(
+            {
+                "datetime": meta["datetime"],
+                "filename": wavfile,
+                "length": len(x),
+                "sr": sr,
+                "dB": 10 * np.log10(np.std(x) ** 2),
+            }
+        )
+
     # Create DataFrame from collected rows all at once
     Df = pd.DataFrame(data_rows)
     if not Df.empty:
-        Df = Df.sort_values('datetime').reset_index(drop=True)
+        Df = Df.sort_values("datetime").reset_index(drop=True)
     else:
-        Df = pd.DataFrame(columns=['filename', 'datetime', 'length', 'sr', 'dB'])
-    return(Df)
+        Df = pd.DataFrame(columns=["filename", "datetime", "length", "sr", "dB"])
+    return Df

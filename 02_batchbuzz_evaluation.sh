@@ -1,4 +1,4 @@
-dirlist="/home/mgallet/Documents/DATA/BumbleBuzz_test"
+dirlist="/home/mgallet/Documents/DATA/BumbleBuzz"
 
 # iterate over all subdirectories in $dirlist
 for fullpath in "$dirlist"/*/ ; do

@@ -1,21 +1,62 @@
-Automatic Audio tagging of large collection of soundscapes using PANNs - specific branch for BumbleBuzz project.
+# Documentation Technique
 
-## Requirements
+## Vue d'ensemble
 
-Install the following dependencies (versions should not matter) using your favorite package manager (pip, conda, ...)
+Ce système permet l'analyse et l'évaluation de détections acoustiques automatisées, avec support pour l'optimisation de seuils, l'analyse d'erreurs par classe, et l'évaluation à différentes échelles (locale et globale).
 
-- huggingface_hub
-- pandas
-- pytorch
-- torchaudio
-- librosa
-- numpy
-- scipy
-- torchinfo
-- plotly (optional, for the dash app)
-- dash (optional, for the dash app)
+## Configuration de l'environnement
 
-## How to use
+### Création de l'environnement virtuel
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Linux/macOS
+# ou .venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+```
+
+### Activation de l'environnement virtuel
+
+```bash
+source .venv/bin/activate
+```
+
+
+## Taxonomie des classes
+
+### Classes primaires (TaggingCategory.csv)
+
+- **fly_housefly** : Mouches, mouches domestiques
+- **bee_wasp** : Abeilles, guêpes
+- **water** : Sons d'eau (ruisseau, cascade, pluie)
+- **wind** : Sons de vent (feuilles, bruit de micro)
+- **motor_vehicle** : Véhicules motorisés (voiture, klaxon, freinage)
+- **aircraft** : Aéronefs (avion, hélicoptère, moteur à réaction)
+- **human_voice** : Voix humaine (parole, chant, rire, pleurs)
+
+### Meta-classes (configuration)
+
+- **Group_buzz** : Regroupement des sons d'insectes bourdonnants
+- **Group_geophony** : Sons naturels non-biologiques (eau, vent)
+- **Group_anthropophony** : Sons d'origine humaine (véhicules, voix)
+
+## Exécution des scripts
+### Détection par lots (01_batchbuzz_detection.sh)
+
+```bash
+./01_batchbuzz_detection.sh
+``` 
+Ce script traite tous les sous-répertoires dans le répertoire spécifié, effectuant la détection acoustique sur chaque ensemble de données, place les découpages audio dans un sous-dossier `data_cut` et sauvegarde les résultats dans un fichier CSV.
+
+### Évaluation par lots (02_batchbuzz_evaluation.sh)
+
+```bash
+./02_batchbuzz_evaluation.sh
+```
+Ce script évalue les résultats de la détection en comparant les fichiers CSV générés avec les annotations de référence, et sauvegarde les résultats d'évaluation dans un fichier CSV. Les fichiers de prédiction sont déplacés dans un sous-dossier `predictions` et les résultats d'évaluation dans un sous-dossier `evaluation`.
+
+
+## How to use directly process.py and dash_app.py
 
 First, create a directory with wav audio files named YYMMDD_HHMMSS.wav/flac or What_EVER_YYMMDD_HHMMSS.wav/flac.
 Then, use process.py to perform buzz detection (+many other audio tagging).
